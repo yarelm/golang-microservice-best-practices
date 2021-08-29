@@ -18,7 +18,9 @@ func main() {
 	debug := flagSet.Bool("debug", false, "sets log level to debug")
 	port := flagSet.String("port", "8080", "port to listen")
 
-	viper.BindPFlags(flagSet)
+	if err := viper.BindPFlags(flagSet); err != nil {
+		log.Fatal().Err(err).Msg("failed to bind viper flags")
+	}
 	viper.AutomaticEnv()
 
 	// Default level for this example is info, unless debug flag is present
@@ -34,5 +36,7 @@ func main() {
 	defer cancel()
 
 	server := api.NewServer(fmt.Sprintf(":%v", *port))
-	server.Serve(ctx)
+	if err := server.Serve(ctx); err != nil {
+		log.Fatal().Err(err).Msg("failed to serve API")
+	}
 }
