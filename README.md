@@ -4,8 +4,11 @@ A very simple Go microservice filled with "best practices" aimed to run safely a
 
 The goal is to help you improve your Production checklist by concepts and perhaps adapt this as a skeleton.
 
+# Deployments
+## Cloud Run
+Run `gcloud run deploy`, follow the on-screen instructions, and you are good to go.
 
-TODO:
+# TODO:
 * Health and readiness checks
 * Connect with external dependency
 * 12 factor app
