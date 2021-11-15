@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/gorilla/mux"
+	"github.com/heptiolabs/healthcheck"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
 
@@ -23,13 +23,22 @@ func NewServer(addr string) *Server {
 	}
 }
 
-func (s *Server) Serve(ctx context.Context) error {
+func (s *Server) Serve(ctx context.Context, health healthcheck.Handler) error {
 	s.router.HandleFunc("/", s.rootHandler).Methods(http.MethodGet)
 
 	srv := &http.Server{
 		Addr:    s.addr,
 		Handler: s.router,
 	}
+
+	health.AddReadinessCheck("HTTP", func() error {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			return nil
+		}
+	})
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
